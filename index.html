@@ -169,11 +169,12 @@
     </div>
 
     <button class="bigbtn" id="btnCam"><span class="ic">📸</span>
-      <span>カメラで撮影する<span class="sub">ガイド付きでその場で撮影（公開ページ・HTTPSで動作）</span></span>
+      <span>カメラで撮る<span class="sub">スマホのカメラが起動します</span></span>
     </button>
     <button class="bigbtn" id="btnFile"><span class="ic">🖼️</span>
-      <span>写真を選ぶ・撮る<span class="sub">スマホのカメラ／アルバムから読み込み</span></span>
+      <span>アルバムから選ぶ<span class="sub">撮影済みの写真を読み込み</span></span>
     </button>
+    <input type="file" id="camInput" accept="image/*" capture="user" hidden>
     <input type="file" id="fileInput" accept="image/*" hidden>
 
     <div class="card">
@@ -184,34 +185,6 @@
         <b>④ 出力：</b>履歴書・マイナンバー等のサイズ＋L判印刷シート
       </div>
     </div>
-  </section>
-
-  <!-- ============ CAMERA ============ -->
-  <section id="scr-camera">
-    <div id="camWrap">
-      <video id="camVideo" autoplay playsinline muted></video>
-      <svg id="camGuide" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <g id="cg-id">
-          <ellipse cx="50" cy="42" rx="26" ry="33" fill="none" stroke="rgba(255,255,255,.85)" stroke-width=".7" stroke-dasharray="2 1.4"/>
-          <line x1="50" y1="8" x2="50" y2="92" stroke="rgba(255,255,255,.35)" stroke-width=".35"/>
-        </g>
-        <g id="cg-bust" style="display:none">
-          <ellipse cx="50" cy="27" rx="16" ry="20" fill="none" stroke="rgba(255,255,255,.85)" stroke-width=".7" stroke-dasharray="2 1.4"/>
-          <path d="M10,100 C22,64 40,55 50,55 C60,55 78,64 90,100" fill="none" stroke="rgba(255,255,255,.7)" stroke-width=".6" stroke-dasharray="2 1.4"/>
-        </g>
-        <g id="cg-full" style="display:none">
-          <circle cx="50" cy="12" r="7.5" fill="none" stroke="rgba(255,255,255,.85)" stroke-width=".7" stroke-dasharray="2 1.4"/>
-          <line x1="50" y1="20" x2="50" y2="91" stroke="rgba(255,255,255,.55)" stroke-width=".45" stroke-dasharray="2 1.4"/>
-          <line x1="30" y1="93" x2="70" y2="93" stroke="rgba(255,255,255,.75)" stroke-width=".6" stroke-dasharray="2 1.4"/>
-        </g>
-      </svg>
-    </div>
-    <div class="camRow">
-      <button class="smallbtn" id="btnCamBack">← 戻る</button>
-      <button class="roundbtn shutter" id="btnShutter" title="撮影">📷</button>
-      <button class="smallbtn" id="btnFlip">🔄 切替</button>
-    </div>
-    <p class="hint" id="camHint" style="text-align:center;"></p>
   </section>
 
   <!-- ============ EDIT ============ -->
@@ -240,7 +213,8 @@
     <div class="pane" id="pane-bg">
       <div class="swatches" id="bgSwatches"></div>
       <div class="warnbox" id="segWarn">⚠️ 背景切り抜きAIを読み込めませんでした（通信環境をご確認ください）。背景は「元のまま」で出力されます。</div>
-      <p class="hint">💡 就活・履歴書は白かブルー、マイナンバー・パスポートは白がおすすめです。背景からはみ出たアホ毛は切り抜き時に自動で消えます。</p>
+      <div class="sliderRow" style="margin-top:12px;"><label>境界</label><input type="range" id="slEdge" min="-10" max="10" value="0"><output id="oEdge">0</output></div>
+      <p class="hint">💡 就活・履歴書は白かブルー、マイナンバー・パスポートは白がおすすめです。<b>髪が削れてしまうときは「境界」を＋方向へ、元の背景が残ってしまうときは−方向へ</b>。細かい部分は「ブラシ→人物に追加／アホ毛けし」でなぞって直せます。</p>
     </div>
 
     <div class="pane" id="pane-adjust">
@@ -271,13 +245,13 @@
       <div class="chips" style="margin-bottom:6px;">
         <button class="chip on" data-brush="erase">✂️ アホ毛けし<small>なぞった毛を背景に</small></button>
         <button class="chip" data-brush="smooth">🪄 なめらか<small>肌・毛の乱れをぼかす</small></button>
-        <button class="chip" data-brush="restore">🩹 もどす<small>消しすぎた部分を復元</small></button>
+        <button class="chip" data-brush="restore">🩹 人物に追加<small>削れた髪や輪郭を復元</small></button>
       </div>
       <div class="sliderRow"><label>太さ</label><input type="range" id="slBrushSize" min="8" max="70" value="26"><output id="oBrushSize">26</output></div>
       <div style="display:flex;gap:8px;">
         <button class="smallbtn" id="btnUndo">↩ ひとつ戻す</button>
       </div>
-      <p class="hint">💡 プレビュー上を指でなぞると修正されます（ブラシ中は移動できません。移動は他のタブで）。輪郭からはみ出たアホ毛は「アホ毛けし」、顔まわりの短い毛や肌荒れは「なめらか」が有効です。</p>
+      <p class="hint">💡 プレビュー上を指でなぞると修正されます（ブラシ中は移動できません。移動は他のタブで）。輪郭からはみ出たアホ毛は「アホ毛けし」、顔まわりの短い毛や肌荒れは「なめらか」、切り抜きで髪が消えてしまった部分は「人物に追加」でなぞると戻ります。</p>
     </div>
 
     <div class="editActions">
@@ -322,12 +296,9 @@ const clamp = (v,a,b)=>Math.min(b,Math.max(a,v));
 
 /* ---------- 写真の種類 ---------- */
 const TYPES = [
-  {id:'id',   name:'証明写真',     icon:'🪪', hint:'履歴書・マイナンバー・免許など規格サイズで出力します',
-    camHint:'点線の枠に顔を合わせてください（あごが枠の下端あたり）'},
-  {id:'bust', name:'バストアップ', icon:'👤', hint:'SNSアイコン・ビジネスプロフィール向け。胸から上を撮影します',
-    camHint:'頭から胸元までが点線に入るように写してください'},
-  {id:'full', name:'全身',         icon:'🧍', hint:'宣材・オーディション・プロフィール用の全身写真。縦向き撮影がおすすめ',
-    camHint:'頭から足もとまで全身が入るように写してください（縦向き推奨）'},
+  {id:'id',   name:'証明写真',     icon:'🪪', hint:'履歴書・マイナンバー・免許など規格サイズで出力します。あごが画面中央くらいに来るように撮影を'},
+  {id:'bust', name:'バストアップ', icon:'👤', hint:'SNSアイコン・ビジネスプロフィール向け。頭から胸元までが入るように撮影を'},
+  {id:'full', name:'全身',         icon:'🧍', hint:'宣材・オーディション・プロフィール用の全身写真。縦向きで頭から足もとまで入るように撮影を'},
 ];
 
 /* ---------- サイズプリセット（証明写真は300dpi換算） ---------- */
@@ -380,6 +351,7 @@ const S = {
   bg: BGS[0],
   bright:0, contrast:0, smooth:0,
   eyeSize:0, nose:0, hairDark:0, eyeExtraL:0, eyeExtraR:0, landmarks:null,
+  edge:0,
   zoom:1, camX:0, camY:0,
   guide:true,
   tab:'size',
@@ -510,17 +482,39 @@ async function loadSource(source){   // source: <img> か <canvas>
 
   loading('AIが背景を解析中…');
   const mask = await runSegmentation(srcCv);
-  if(mask){ normalizeMask(mask); S.maskReady=true; $('segWarn').classList.remove('show'); }
+  let maskOk=false;
+  if(mask){ normalizeMask(mask); maskOk=true; }
+  // 髪認識AI(6分類)でマスクを補強：従来AIが取りこぼした髪・輪郭を追加
+  loading('髪・輪郭を詳細に解析中…（初回は数秒かかります）');
+  const mc = await Promise.race([runMulticlass(srcCv), new Promise(r=>setTimeout(()=>r(null),30000))]);
+  hairCv = mc ? mc.hair : null;
+  if(mc && mc.personPx>400){
+    const w=srcCv.width, h=srcCv.height;
+    if(!maskOk){ maskCv.width=w; maskCv.height=h; }   // 従来AI失敗時は詳細AI単独で
+    const c=maskCv.getContext('2d');
+    c.save();
+    c.filter='blur(2px)';                              // 低解像度マスクの角をならす
+    c.drawImage(mc.person,0,0,w,h);
+    c.restore();
+    maskOk=true;
+    maskOrig.width=w; maskOrig.height=h;
+    const oc=maskOrig.getContext('2d');
+    oc.clearRect(0,0,w,h); oc.drawImage(maskCv,0,0);
+  }
+  S.maskReady=maskOk;
+  if(maskOk){ $('segWarn').classList.remove('show'); }
   else{
-    S.maskReady=false; S.bg=BGS.find(b=>b.id==='none');
+    S.bg=BGS.find(b=>b.id==='none');
     $('segWarn').classList.add('show');
     renderBgSwatches();
   }
+  maskRenderDirty=true;
   loading('顔のパーツを検出中…');
   const lm = await runFaceMesh(srcCv);
   S.landmarks = lm ? lm.map(p=>({x:p.x*srcCv.width, y:p.y*srcCv.height})) : null;
   S.eyeSize=0; S.nose=0; S.hairDark=0; S.eyeExtraL=0; S.eyeExtraR=0;
-  hairCv=null; warpDirty=true;
+  S.edge=0; $('slEdge').value=0; $('oEdge').textContent=0;
+  warpDirty=true;
   updateFacePane();
   undoStack.length=0;
   S.zoom=1; S.bright=0; S.contrast=0; S.smooth=0;
@@ -534,9 +528,8 @@ async function loadSource(source){   // source: <img> か <canvas>
   if(S.maskReady) toast('背景を切り抜きました。タブで背景・サイズ・補正を選べます');
 }
 
-/* ファイル選択 */
-$('btnFile').onclick=()=>$('fileInput').click();
-$('fileInput').onchange=e=>{
+/* ファイル選択（カメラ起動もスマホ標準カメラに集約） */
+function handleFile(e){
   const f=e.target.files[0]; if(!f)return;
   const url=URL.createObjectURL(f);
   const img=new Image();
@@ -544,48 +537,11 @@ $('fileInput').onchange=e=>{
   img.onerror=()=>{ toast('画像を開けませんでした'); URL.revokeObjectURL(url); };
   img.src=url;
   e.target.value='';
-};
-
-/* =====================================================
-   カメラ
-   ===================================================== */
-let stream=null, facing='user';
-async function startCam(){
-  stopCam();
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:facing, width:{ideal:1920}, height:{ideal:1440}}, audio:false
-    });
-    const v=$('camVideo');
-    v.srcObject=stream;
-    v.classList.toggle('mirror', facing==='user');
-    await v.play();
-    show('scr-camera');
-  }catch(e){
-    toast('カメラを起動できませんでした。「写真を選ぶ・撮る」からカメラをご利用ください');
-  }
 }
-function stopCam(){
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
-}
-$('btnCam').onclick=()=>{
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.isSecureContext){
-    toast('この環境ではライブ撮影が使えません（公開後のHTTPSページで動作します）。「写真を選ぶ・撮る」をご利用ください',3800);
-    return;
-  }
-  startCam();
-};
-$('btnFlip').onclick=()=>{ facing = facing==='user' ? 'environment':'user'; startCam(); };
-$('btnCamBack').onclick=()=>{ stopCam(); show('scr-home'); };
-$('btnShutter').onclick=()=>{
-  const v=$('camVideo');
-  if(!v.videoWidth){ toast('カメラ準備中です'); return; }
-  const cap=document.createElement('canvas');
-  cap.width=v.videoWidth; cap.height=v.videoHeight;
-  cap.getContext('2d').drawImage(v,0,0);
-  stopCam();
-  loadSource(cap);
-};
+$('btnFile').onclick=()=>$('fileInput').click();
+$('btnCam').onclick=()=>$('camInput').click();
+$('fileInput').onchange=handleFile;
+$('camInput').onchange=handleFile;
 
 /* =====================================================
    合成（背景 + 人物 + 補正）
@@ -615,7 +571,7 @@ function rebuild(){
   const p=tmpA.getContext('2d');
   p.clearRect(0,0,w,h);
   p.filter='blur(1.4px)';                 // 輪郭をなじませる
-  p.drawImage(maskCv,0,0);
+  p.drawImage(getMaskRender(),0,0);
   p.filter='none';
   p.globalCompositeOperation='source-in';
   p.drawImage(rs,0,0);
@@ -646,7 +602,7 @@ function drawSmoothedPerson(c,w,h,filt,rs){
   tmpA.width=w; tmpA.height=h;
   const p=tmpA.getContext('2d');
   p.clearRect(0,0,w,h);
-  p.drawImage(maskCv,0,0);
+  p.drawImage(getMaskRender(),0,0);
   p.globalCompositeOperation='source-in';
   p.drawImage(rs||srcCv,0,0);
   p.globalCompositeOperation='source-over';
@@ -660,6 +616,35 @@ function drawSmoothedPerson(c,w,h,filt,rs){
 const warpCv=document.createElement('canvas');
 let warpDirty=true;
 let hairCv=null, hairSegmenter=null, hairFailed=false, hairLoading=false;
+
+/* ---- マスクの境界調整（広げる/狭める）を反映した描画用マスク ---- */
+const maskRenderCv=document.createElement('canvas');
+let maskRenderDirty=true;
+function getMaskRender(){
+  if(!maskRenderDirty) return maskRenderCv;
+  const w=maskCv.width, h=maskCv.height;
+  maskRenderCv.width=w; maskRenderCv.height=h;
+  const c=maskRenderCv.getContext('2d');
+  c.clearRect(0,0,w,h);
+  if(S.edge===0){
+    c.drawImage(maskCv,0,0);
+  }else{
+    // ぼかしてからしきい値をずらす＝擬似的な膨張(＋)/収縮(−)
+    const r=Math.min(12, Math.abs(S.edge)*1.2+1);
+    c.filter=`blur(${r}px)`;
+    c.drawImage(maskCv,0,0);
+    c.filter='none';
+    const im=c.getImageData(0,0,w,h), d=im.data;
+    const T=S.edge>0?55:205, lo=Math.max(1,T-45), hi=Math.min(254,T+45);
+    for(let i=3;i<d.length;i+=4){
+      const a=d[i];
+      d[i]= a<=lo?0 : a>=hi?255 : Math.round((a-lo)*255/(hi-lo));
+    }
+    c.putImageData(im,0,0);
+  }
+  maskRenderDirty=false;
+  return maskRenderCv;
+}
 
 function faceActive(){
   return S.landmarks && (S.eyeSize+S.eyeExtraL>0 || S.eyeSize+S.eyeExtraR>0 || S.nose>0);
@@ -751,7 +736,7 @@ function balanceFix(){
     const ca=Math.abs(Math.cos(ang)), sa=Math.abs(Math.sin(ang));
     const sc=Math.max((w*ca+h*sa)/w, (w*sa+h*ca)/h);  // 回転後も全面を覆う倍率
     rotateCanvasInPlace(srcCv,-ang,sc);
-    if(S.maskReady){ rotateCanvasInPlace(maskCv,-ang,sc); rotateCanvasInPlace(maskOrig,-ang,sc); }
+    if(S.maskReady){ rotateCanvasInPlace(maskCv,-ang,sc); rotateCanvasInPlace(maskOrig,-ang,sc); maskRenderDirty=true; }
     // ランドマークも同じ変換で追従
     const cos=Math.cos(-ang), sin=Math.sin(-ang);
     S.landmarks=L.map(p=>{
@@ -775,11 +760,10 @@ function balanceFix(){
   if(S.hairDark>0 && !hairFailed){ ensureHairMask().then(after); } else after();
 }
 
-/* ---- 髪の検出（MediaPipe マルチクラス・遅延読み込み） ---- */
-async function ensureHairMask(){
-  if(hairCv || hairFailed || hairLoading) return;
-  hairLoading=true;
-  loading('髪の領域をAI解析中…（初回は数秒かかります）');
+/* ---- 髪・人物の詳細検出（MediaPipe マルチクラス6分類） ----
+   カテゴリ: 0=背景 1=髪 2=体の肌 3=顔の肌 4=服 5=その他(メガネ等) */
+async function runMulticlass(target){
+  if(hairFailed) return null;
   // 旧版MediaPipe(face_mesh等)が定義するグローバルModuleとtasks-visionのwasm初期化が
   // 衝突するため、処理中だけ退避する
   const savedModule=window.Module;
@@ -792,26 +776,42 @@ async function ensureHairMask(){
         baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite'},
         outputCategoryMask:true, outputConfidenceMasks:false, runningMode:'IMAGE'});
     }
-    const res=hairSegmenter.segment(srcCv);
+    const res=hairSegmenter.segment(target);
     const cm=res.categoryMask;
     const mw=cm.width, mh=cm.height;
     const arr=cm.getAsUint8Array();
-    const hc=document.createElement('canvas'); hc.width=mw; hc.height=mh;
-    const hctx=hc.getContext('2d');
-    const im=hctx.createImageData(mw,mh);
-    let hairPx=0;
+    const hair=document.createElement('canvas');   hair.width=mw;   hair.height=mh;
+    const person=document.createElement('canvas'); person.width=mw; person.height=mh;
+    const hctx=hair.getContext('2d'), pctx=person.getContext('2d');
+    const hi=hctx.createImageData(mw,mh), pi=pctx.createImageData(mw,mh);
+    let hairPx=0, personPx=0;
     for(let i=0;i<arr.length;i++){
-      if(arr[i]===1){ const o=i*4; im.data[o]=255; im.data[o+1]=255; im.data[o+2]=255; im.data[o+3]=255; hairPx++; }
+      const v=arr[i], o=i*4;
+      if(v===1){ hi.data[o]=hi.data[o+1]=hi.data[o+2]=hi.data[o+3]=255; hairPx++; }
+      if(v>=1){ pi.data[o]=pi.data[o+1]=pi.data[o+2]=pi.data[o+3]=255; personPx++; }
     }
-    hctx.putImageData(im,0,0);
-    hairCv=hc;
+    hctx.putImageData(hi,0,0);
+    pctx.putImageData(pi,0,0);
     cm.close(); if(res.close) res.close();
-    if(hairPx<50) toast('この写真では髪を検出できませんでした（正面から明るい場所で撮った写真だと認識されやすくなります）',3800);
+    return {hair, person, hairPx, personPx};
   }catch(e){
     hairFailed=true;
-    toast('髪検出AIを読み込めませんでした（通信環境をご確認ください）',3400);
+    return null;
   }finally{
     window.Module=savedModule;
+  }
+}
+/* 「髪を暗く」用（読み込み時に取得済みなら即利用、なければここで取得） */
+async function ensureHairMask(){
+  if(hairCv || hairFailed || hairLoading) return;
+  hairLoading=true;
+  loading('髪の領域をAI解析中…');
+  const mc=await runMulticlass(srcCv);
+  if(mc){
+    hairCv=mc.hair;
+    if(mc.hairPx<50) toast('この写真では髪を検出できませんでした（正面から明るい場所で撮った写真だと認識されやすくなります）',3800);
+  }else{
+    toast('髪検出AIを読み込めませんでした（通信環境をご確認ください）',3400);
   }
   hairLoading=false;
   loading(false);
@@ -991,13 +991,16 @@ function paintAt(vp){
     c.fillStyle=g;
     c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
     c.restore();
+    maskRenderDirty=true;
   }else if(S.brushMode==='restore'){
+    // 人物に追加：AIが背景と誤認した髪などをマスクに描き足して復元
     if(!S.maskReady){ toast('切り抜きが無効のため使えません'); painting=false; return; }
     const c=maskCv.getContext('2d');
-    c.save();
-    c.beginPath(); c.arc(x,y,r,0,6.3); c.clip();
-    c.drawImage(maskOrig,0,0);
-    c.restore();
+    const g=c.createRadialGradient(x,y,r*0.35,x,y,r);
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    c.fillStyle=g;
+    c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
+    maskRenderDirty=true;
   }else{ // smooth：局所ぼかし
     const d=Math.ceil(r*2);
     tmpB.width=d; tmpB.height=d;
@@ -1055,7 +1058,7 @@ $('btnUndo').onclick=()=>{
   }else{
     restore(u.layer==='src' ? srcCv : maskCv, u.cv);
   }
-  warpDirty=true;
+  warpDirty=true; maskRenderDirty=true;
   rebuild(); drawView();
 };
 
@@ -1071,17 +1074,13 @@ function renderTypeChips(){
     b.onclick=()=>{
       S.type=t;
       S.preset=PRESETS[t.id][0];
-      renderTypeChips(); renderPresetChips(); updateCamGuide();
+      // 全身は他の人に撮ってもらう想定で背面カメラを優先
+      $('camInput').setAttribute('capture', t.id==='full' ? 'environment' : 'user');
+      renderTypeChips(); renderPresetChips();
     };
     box.appendChild(b);
   });
   $('typeHint').textContent=S.type.hint;
-}
-function updateCamGuide(){
-  ['id','bust','full'].forEach(id=>{
-    $('cg-'+id).style.display = id===S.type.id ? '' : 'none';
-  });
-  $('camHint').textContent=S.type.camHint;
 }
 function renderPresetChips(){
   const box=$('presetChips'); box.innerHTML='';
@@ -1170,6 +1169,16 @@ $('btnFaceReset').onclick=()=>{
   toast('顔パーツの調整をリセットしました（傾き補正は「ブラシ→ひとつ戻す」で戻せます）',3000);
 };
 
+/* 切り抜き境界スライダー */
+let edgeRaf=0;
+$('slEdge').addEventListener('input',e=>{
+  S.edge=+e.target.value; $('oEdge').textContent=S.edge;
+  if(!S.maskReady){ return; }
+  maskRenderDirty=true;
+  cancelAnimationFrame(edgeRaf);
+  edgeRaf=requestAnimationFrame(()=>{ rebuild(); drawView(); });
+});
+
 /* ズームスライダー・ガイド */
 $('zoomSlider').addEventListener('input',e=>{ S.zoom=+e.target.value/100; drawView(); });
 $('chkGuide').addEventListener('change',e=>{ S.guide=e.target.checked; drawView(); });
@@ -1254,7 +1263,6 @@ $('btnDlSheet').onclick=()=>{
    初期化
    ===================================================== */
 renderTypeChips();
-updateCamGuide();
 renderPresetChips();
 renderBgSwatches();
 window.addEventListener('resize',()=>{ if($('scr-edit').classList.contains('active')){ fitView(); drawView(); } });
